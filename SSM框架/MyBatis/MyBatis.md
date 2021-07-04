@@ -131,7 +131,7 @@ Mybatis 动态 sql 可以在 Xml 映射文件内，以标签的形式编写动�
 
 #### 10. Xml 映射文件中，除了常见的 select|insert|updae|delete标签外,还有那些标签?
 
-<resultMap>、<parameterMap>、<sql>、<include>、<selectKey>，加上动态 sql 的 9 个标签，其中<sql>为 sql 片段标签，通过<include>标签引入 sql 片段，<selectKey>为不支持自增的主键生成策略标
+**resultMap,parameterMap,sql,include,selectKey**，加上动态 sql 的 9 个标签，其中sql为 sql 片段标签，通过include标签引入 sql 片段，selectKey为不支持自增的主键生成策略标
 签。     
 
    
