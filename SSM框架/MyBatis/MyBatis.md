@@ -133,5 +133,29 @@ Mybatis 动态 sql 可以在 Xml 映射文件内，以标签的形式编写动�
 
 **resultMap,parameterMap,sql,include,selectKey**，加上动态 sql 的 9 个标签，其中sql为 sql 片段标签，通过include标签引入 sql 片段，selectKey为不支持自增的主键生成策略标
 签。     
+#### 11. 一对一,一对多的关联查询?
 
+```java
+// association 是一对一关联查询的关键字
+// 实体类的字段名和数据表的字段名映射
+// collection 是一对一关联查询的关键字
+```
+
+1. mybatis实现一对一有几种方式? 
+
+   **有联合查询和嵌套查询**,**联合查询**是几个表联合查询,**只查询一次**, 通过在
+   resultMap 里面配置 association 节点配置一对一的类就可以完成；**嵌套查询是先查一个表**，根据这个表里面的结果的 外键 id，去再另外一个表里面查询数据,也是通过 **association** 配置，但另外一个表的查询**通过 select 属性**配置。
+
+2. mybatis实现一对多有几种方式? 
+
+   **有联合查询和嵌套查询**,**联合查询**是几个表联合查询,**只查询一次**, 通过在
+   resultMap 里面配置 collection 节点配置一对一的类就可以完成；**嵌套查询是先查一个表**，根据这个表里面的结果的 外键 id，去再另外一个表里面查询数据,也是通过 **collection** 配置，但另外一个表的查询**通过 select 属性**配置。
+
+#### 12. Mybatis 是否支持延迟加载？如果支持，它的实现原理是什么？
+
+1. **Mybatis 仅支持 association 关联对象和 collection 关联集合对象的延迟加载**，association 指的就是一对一，collection 指的就是一对多查询。在 Mybatis配置文件中，可以配置是否启用延迟加载lazyLoadingEnabled=true|false。
+
+2. 原理: 它的原理是，使用 **CGLIB** 创建目标对象的代理对象，当调用目标方法时，进入拦截器方法，比如调用 a.getB().getName()，拦截器 invoke()方法发现 a.getB()是null 值，那么就会单独发送事先保存好的查询关联 B 对象的 sql，把 B 查询上来，然后调用 a.setB(b)，于是 a 的对象 b 属性就有值了，接着完成a.getB().getName()方法的调用。这就是延迟加载的基本原理。
+
+  
    
