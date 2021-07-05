@@ -156,6 +156,36 @@ Mybatis 动态 sql 可以在 Xml 映射文件内，以标签的形式编写动�
 1. **Mybatis 仅支持 association 关联对象和 collection 关联集合对象的延迟加载**，association 指的就是一对一，collection 指的就是一对多查询。在 Mybatis配置文件中，可以配置是否启用延迟加载lazyLoadingEnabled=true|false。
 
 2. 原理: 它的原理是，使用 **CGLIB** 创建目标对象的代理对象，当调用目标方法时，进入拦截器方法，比如调用 a.getB().getName()，拦截器 invoke()方法发现 a.getB()是null 值，那么就会单独发送事先保存好的查询关联 B 对象的 sql，把 B 查询上来，然后调用 a.setB(b)，于是 a 的对象 b 属性就有值了，接着完成a.getB().getName()方法的调用。这就是延迟加载的基本原理。
+#### 13. Mybatis 的一级、二级缓存
+      
+1. 一级缓存: 基于 PerpetualCache 的 HashMap 本地缓存，其存储作用域为Session，当 Session flush 或 close 之后，该 Session 中的所有 Cache 就将清空，默认打开一级缓存。
+2. 二级缓存与一级缓存其机制相同，默认也是采用 PerpetualCache，HashMap存储，不同在于其存储作用域为 Mapper(Namespace)，并且可自定义存储源，如 Ehcache。默认不打开二级缓存，要开启二级缓存，使用二级缓存属性类需要实现 Serializable 序列化接口(可用来保存对象的状态),可在它的映射文件中配置<cache/> ;
+3. 对于缓存数据更新机制，当某一个作用域(一级缓存 Session/二级缓存Namespaces)的进行了 C/U/D 操作后，默认该作用域下所有 select 中的缓存将被 clear。
 
+#### 14. 什么是Mybatis的接口绑定?有哪些实现方式?
+
+1. 接口绑定，就是在 MyBatis 中任意定义接口,然后把接口里面的方法和 SQL 语句绑定, 我们直接调用接口方法就可以,这样比起原来了 SqlSession 提供的方法我们可以有更加灵活的选择和设置。
+2. 接口绑定有两种实现方式,一种是通过注解绑定，就是在接口的方法上面加上@Select、@Update 等注解，里面包含 Sql 语句来绑定；另外一种就是通过 xml里面写 SQL 来绑定, 在这种情况下,要指定 xml 映射文件里面的 namespace 必须为接口的全路径名。当 Sql 语句比较简单时候,用注解绑定, 当 SQL 语句比较复杂时候,用 xml 绑定,一般用 xml 绑定的比较多。
+
+#### 15. 使用Mybatis的mapper接口调用时有那些要求?
+
+1. mapper接口方法名和mapper.xml中定义的每个sql的id相同。
+2. mapper接口的输入参数类型和mapper.xml中定义的parameterType类型相同。
+3. 接口方法的输出类型和xml定义的sqlresultType类型相同。
+4. mapper.xml文件中namespace骑士mapper接口的类路径。
+
+#### 16. Mapper编写有哪几种方式?
+
+1. 接口实现类继承 SqlSessionDaoSupport：使用此种方法需要编写mapper 接口，mapper 接口实现类、mapper.xml 文件。
+2. 使用 org.mybatis.spring.mapper.MapperFactoryBean
+3. 使用mapper扫描器
+4. 使用扫描器后从 spring 容器中获取 mapper 的实现对象。
+
+#### 17. 简述Mybatis的插件运行原理,如何编写一个插件?
+
+1. Mybatis 仅可以编写针对 ParameterHandler、ResultSetHandler、StatementHandler、Executor 这 4 种接口的插件，Mybatis 使用 JDK 的动态代理，为需要拦截的接口生成代理对象以实现接口方法拦截功能，每当执行这 4 种接口对象的方法时，就会进入拦截方法，具体就是 InvocationHandler 的 invoke()方法，当然，只会拦截那些你指定需要拦截的方法。
+2. 编写插件：实现 Mybatis 的 Interceptor 接口并复写 intercept()方法，然后在给插件编写注解，指定要拦截哪一个接口的哪些方法即可，记住，别忘了在配置文件中配置你编写的插件。
+
+      
   
    
